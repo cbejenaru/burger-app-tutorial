@@ -8,7 +8,7 @@ const INGREDIENT_PRICES = {
   cheese: 0.4,
   meat: 1.3,
   bacon: 0.7
-}
+};
 
 class BurgerBuilder extends Component {
   state = {
@@ -18,38 +18,64 @@ class BurgerBuilder extends Component {
       cheese: 0,
       meat: 0
     },
-    totalPrice: 4
+    totalPrice: 4,
+    purchasable: false
   };
 
   addIngredientHandler = type => {
+    const ingredients = {
+      ...this.state.ingredients,
+      [type]: this.state.ingredients[type] + 1
+    };
     this.setState({
-      ingredients: {
-        ...this.state.ingredients,
-        [type]: this.state.ingredients[type] + 1
-      },
+      ingredients,
       totalPrice: this.state.totalPrice + INGREDIENT_PRICES[type]
     });
+    this.checkPurchasableStatus(ingredients);
   };
 
   removeIngredientHandler = type => {
+    const ingredients = {
+      ...this.state.ingredients,
+      [type]:
+        this.state.ingredients[type] > 0
+          ? this.state.ingredients[type] - 1
+          : this.state.ingredients[type]
+    };
     this.setState({
-      ingredients: {
-        ...this.state.ingredients,
-        [type]: this.state.ingredients[type] > 0 ? this.state.ingredients[type] - 1 : this.state.ingredients[type]
-      },
-      totalPrice: this.state.ingredients[type] > 0 ? this.state.totalPrice - INGREDIENT_PRICES[type] : this.state.totalPrice
+      ingredients,
+      totalPrice:
+        this.state.ingredients[type] > 0
+          ? this.state.totalPrice - INGREDIENT_PRICES[type]
+          : this.state.totalPrice
     });
+    this.checkPurchasableStatus(ingredients);
   };
 
+  checkPurchasableStatus(ingredients) {
+    const sum = Object.keys(ingredients)
+      .map(ingKey => {
+        return ingredients[ingKey];
+      })
+      .reduce((sum, el) => sum + el);
+    this.setState({purchasable: sum > 0});
+  }
+
   render() {
-    const disableInfo = { ...this.state.ingredients};
-    for(let key in disableInfo) {
-      disableInfo[key] = disableInfo[key] === 0
+    const disableInfo = { ...this.state.ingredients };
+    for (let key in disableInfo) {
+      disableInfo[key] = disableInfo[key] === 0;
     }
     return (
       <Aux>
-        <Burger ingredients={this.state.ingredients}/>
-        <BuildControls add={this.addIngredientHandler} remove={this.removeIngredientHandler} disableInfo={disableInfo} price={this.state.totalPrice}/>
+        <Burger ingredients={this.state.ingredients} />
+        <BuildControls
+          add={this.addIngredientHandler}
+          remove={this.removeIngredientHandler}
+          disableInfo={disableInfo}
+          price={this.state.totalPrice}
+          purchasable={this.state.purchasable}
+        />
       </Aux>
     );
   }
