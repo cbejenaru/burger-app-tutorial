@@ -20,7 +20,6 @@ const burger = props => {
       <BurgerIngredient type="bread-top" />
       {transformedIngredients}
       <BurgerIngredient type="bread-bottom" />
-      <h2>$ {props.price.toFixed(2)}</h2>
     </div> 
   );
 };
